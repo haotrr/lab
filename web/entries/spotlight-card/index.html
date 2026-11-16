@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spotlight Card · Lab</title>
+    <link rel="stylesheet" href="../../shared/base.css" />
+    <link rel="stylesheet" href="../../shared/entry.css" />
+    <style>
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 320px));
+        gap: 16px;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .spotlight {
+        --x: 50%;
+        --y: 50%;
+        --spot: 0;
+        position: relative;
+        padding: 24px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      /* Glow fill that follows the pointer. */
+      .spotlight::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(
+          320px circle at var(--x) var(--y),
+          color-mix(in oklab, var(--accent) 22%, transparent),
+          transparent 60%
+        );
+        opacity: var(--spot);
+        transition: opacity 300ms var(--ease-out);
+      }
+
+      /* Brighter border, drawn only in the 1px ring via mask compositing. */
+      .spotlight::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        padding: 1px;
+        border-radius: inherit;
+        background: radial-gradient(
+          200px circle at var(--x) var(--y),
+          var(--accent),
+          transparent 70%
+        );
+        mask:
+          linear-gradient(#000 0 0) content-box exclude,
+          linear-gradient(#000 0 0);
+        opacity: var(--spot);
+        transition: opacity 300ms var(--ease-out);
+        pointer-events: none;
+      }
+
+      .spotlight h2 {
+        margin: 0 0 6px;
+        font-size: 16px;
+      }
+
+      .spotlight p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="entry-bar">
+      <a href="../../">← Lab</a>
+      <h1>Spotlight Card</h1>
+    </nav>
+
+    <main class="stage">
+      <div class="cards">
+        <article class="spotlight">
+          <h2>跟随光标</h2>
+          <p>径向渐变的圆心绑定到指针位置。</p>
+        </article>
+        <article class="spotlight">
+          <h2>边框高光</h2>
+          <p>用 mask 合成只在 1px 边框内显示高光。</p>
+        </article>
+        <article class="spotlight">
+          <h2>零依赖</h2>
+          <p>只用 CSS 变量与几行 pointer 事件。</p>
+        </article>
+      </div>
+    </main>
+
+    <script type="module">
+      for (const card of document.querySelectorAll(".spotlight")) {
+        card.addEventListener("pointermove", (event) => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty("--x", `${event.clientX - rect.left}px`);
+          card.style.setProperty("--y", `${event.clientY - rect.top}px`);
+          card.style.setProperty("--spot", "1");
+        });
+        card.addEventListener("pointerleave", () => card.style.setProperty("--spot", "0"));
+      }
+    </script>
+  </body>
+</html>

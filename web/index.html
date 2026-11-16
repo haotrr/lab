@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab</title>
+    <link rel="stylesheet" href="shared/base.css" />
+    <style>
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        margin: 4px 0 24px;
+        color: var(--text-muted);
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+
+      .controls input {
+        flex: 1 1 240px;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+      }
+
+      .tag {
+        padding: 2px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        font-size: 13px;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+
+      .tag[aria-pressed="true"] {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .card {
+        display: block;
+        height: 100%;
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        text-decoration: none;
+        transition: border-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+      }
+
+      .card:hover {
+        border-color: var(--accent);
+      }
+
+      .card:active {
+        transform: scale(0.98);
+      }
+
+      .card h2 {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+
+      .card p {
+        margin: 0 0 12px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+
+      .card .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .empty {
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Lab</h1>
+        <p>UI/UX 组件与效果实验室</p>
+      </header>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="搜索标题、描述或标签" aria-label="搜索" />
+        <div id="tags" class="controls" style="margin: 0"></div>
+      </div>
+
+      <ul id="grid" class="grid"></ul>
+      <p id="empty" class="empty" hidden>没有匹配的条目。</p>
+    </main>
+
+    <script type="module">
+      const entries = await fetch("catalog.json").then((r) => r.json());
+      const grid = document.querySelector("#grid");
+      const empty = document.querySelector("#empty");
+      const search = document.querySelector("#search");
+      const tagBar = document.querySelector("#tags");
+      const activeTags = new Set();
+
+      const allTags = [...new Set(entries.flatMap((e) => e.tags))].sort();
+      for (const tag of allTags) {
+        const button = document.createElement("button");
+        button.className = "tag";
+        button.textContent = tag;
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", () => {
+          activeTags.has(tag) ? activeTags.delete(tag) : activeTags.add(tag);
+          button.setAttribute("aria-pressed", String(activeTags.has(tag)));
+          render();
+        });
+        tagBar.append(button);
+      }
+
+      function render() {
+        const q = search.value.trim().toLowerCase();
+        const visible = entries.filter((e) => {
+          const haystack = [e.title, e.summary, ...e.tags].join(" ").toLowerCase();
+          return (!q || haystack.includes(q)) && [...activeTags].every((t) => e.tags.includes(t));
+        });
+
+        grid.replaceChildren(
+          ...visible.map((e) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.className = "card";
+            a.href = `entries/${e.slug}/`;
+            const h2 = document.createElement("h2");
+            h2.textContent = e.title;
+            const p = document.createElement("p");
+            p.textContent = e.summary;
+            const tags = document.createElement("div");
+            tags.className = "tags";
+            tags.append(...e.tags.map((t) => Object.assign(document.createElement("span"), { textContent: `#${t}` })));
+            a.append(h2, p, tags);
+            li.append(a);
+            return li;
+          }),
+        );
+        empty.hidden = visible.length > 0;
+      }
+
+      search.addEventListener("input", render);
+      render();
+    </script>
+  </body>
+</html>

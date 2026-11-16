@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{title}} · Lab</title>
+    <link rel="stylesheet" href="../../shared/base.css" />
+    <link rel="stylesheet" href="../../shared/entry.css" />
+    <style>
+      .demo {
+        padding: 24px 32px;
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="entry-bar">
+      <a href="../../">← Lab</a>
+      <h1>{{title}}</h1>
+    </nav>
+
+    <main class="stage">
+      <div class="demo">{{summary}}</div>
+    </main>
+
+    <script type="module">
+      // 条目专属脚本
+    </script>
+  </body>
+</html>
