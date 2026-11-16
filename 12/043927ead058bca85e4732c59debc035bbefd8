@@ -1,0 +1,25 @@
+web/catalog.json
+  s_2ad43e22a37720::t_67d48ace0d9630 2-13
+web/entries/dark-grain-texture/meta.json
+  s_2ad43e22a37720::t_6ee91647f8bf7f 1-6
+web/entries/dark-grain-texture/index.html
+  s_2ad43e22a37720::t_7dd516e75f1db3 1-287
+web/entries/dark-grain-texture/notes.md
+  s_2ad43e22a37720::t_8f1d4834e2dada 1-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "12043927ead058bca85e4732c59debc035bbefd8",
+  "prompts": {},
+  "sessions": {
+    "s_2ad43e22a37720": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "1e89d71e-a38c-4982-bab7-1c270c1dfd3c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "haotrr <qinhao@qimao.com>"
+    }
+  }
+}
