@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dark Grain Texture · Lab</title>
+    <link rel="stylesheet" href="../../shared/base.css" />
+    <link rel="stylesheet" href="../../shared/entry.css" />
+    <style>
+      :root {
+        --page: #121212;
+        --ink: #fff;
+        --muted: #fff9;
+        --line: #ffffff26;
+        --grain-image: url("noise.png");
+        --grain-size: 128px;
+        --grain-opacity: 0.06;
+        color-scheme: dark;
+      }
+
+      :root[data-theme="light"] {
+        --page: #fff;
+        --ink: #171717;
+        --muted: #6b7280;
+        --line: #0000001a;
+        color-scheme: light;
+      }
+
+      html {
+        background: var(--page);
+      }
+
+      body {
+        background: transparent;
+        color: var(--ink);
+      }
+
+      /*
+       * The grain layer sits between the page background and the content,
+       * so text and images stay clean. Fixed + inset: 0 keeps the texture
+       * still while scrolling and costs a single composited layer.
+       */
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background-image: var(--grain-image);
+        background-size: var(--grain-size) var(--grain-size);
+        background-repeat: repeat;
+        opacity: var(--grain-opacity);
+      }
+
+      :root[data-compare] .grain {
+        clip-path: inset(0 0 0 50%);
+      }
+
+      .divider {
+        position: fixed;
+        inset: 0 auto 0 50%;
+        z-index: 3;
+        width: 1px;
+        background: var(--line);
+        pointer-events: none;
+        display: none;
+      }
+
+      :root[data-compare] .divider {
+        display: block;
+      }
+
+      .entry-bar,
+      .article {
+        position: relative;
+        z-index: 2;
+      }
+
+      .entry-bar {
+        border-color: var(--line);
+      }
+
+      .entry-bar a {
+        color: var(--muted);
+      }
+
+      .article {
+        width: 100%;
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 48px 24px 160px;
+      }
+
+      .article h2 {
+        margin: 0 0 12px;
+        font-size: 28px;
+        letter-spacing: -0.01em;
+      }
+
+      .article p {
+        color: var(--muted);
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin: 32px 0;
+      }
+
+      .swatch {
+        height: 96px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        place-items: end start;
+        padding: 10px;
+        font: 12px var(--font-mono);
+        color: var(--muted);
+      }
+
+      .panel {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 4;
+        width: 260px;
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: color-mix(in oklab, var(--page) 80%, transparent);
+        backdrop-filter: blur(12px);
+        font-size: 13px;
+      }
+
+      .panel label {
+        display: grid;
+        grid-template-columns: 64px 1fr 44px;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .panel output {
+        font-family: var(--font-mono);
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .panel select,
+      .panel input[type="color"] {
+        grid-column: 2 / 4;
+        width: 100%;
+      }
+
+      .panel .row {
+        display: flex;
+        gap: 12px;
+      }
+
+      .panel .row label {
+        display: flex;
+        gap: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="divider" aria-hidden="true"></div>
+
+    <nav class="entry-bar">
+      <a href="../../">← Lab</a>
+      <h1>Dark Grain Texture</h1>
+    </nav>
+
+    <main class="article">
+      <h2>暗色磨砂质感</h2>
+      <p>
+        参考 blog.guoqi.dev：在 #121212 的纯色背景上，铺一层 6% 不透明度的灰度噪点图。纯色背景在大屏上显得“平”和“塑料”，
+        细微的颗粒让它更像纸张或磨砂玻璃，同时几乎不影响对比度。
+      </p>
+      <p>打开右下角的“对比”，左半屏是纯色，右半屏带颗粒。把亮度调高或换成浅色主题，差异会更明显。</p>
+
+      <div class="swatches">
+        <div class="swatch" style="background: #121212">#121212</div>
+        <div class="swatch" style="background: #1c1c1e">#1c1c1e</div>
+        <div class="swatch" style="background: #0f172a">#0f172a</div>
+        <div class="swatch" style="background: #1a1410">#1a1410</div>
+      </div>
+
+      <p>
+        颗粒层在背景之上、内容之下，所以色块同样带颗粒，而文字保持清晰。若希望颗粒覆盖内容（更像胶片），把颗粒层的 z-index
+        调到内容之上即可。
+      </p>
+      <p>
+        原站用 256×256 的图片按 128px 平铺：在 2x 屏幕上，每个噪点正好对应一个物理像素，颗粒最细；在 1x 屏幕上会被缩小采样，颗粒更柔和。
+      </p>
+    </main>
+
+    <form class="panel" id="panel">
+      <label>来源
+        <select name="source">
+          <option value="png">PNG 平铺（原站做法）</option>
+          <option value="svg">SVG feTurbulence</option>
+          <option value="canvas">Canvas 运行时生成</option>
+          <option value="none">关闭</option>
+        </select>
+      </label>
+      <label>不透明度 <input name="opacity" type="range" min="0" max="0.3" step="0.01" value="0.06" /><output></output></label>
+      <label>平铺尺寸 <input name="size" type="range" min="32" max="512" step="16" value="128" /><output></output></label>
+      <label>背景色 <input name="page" type="color" value="#121212" /></label>
+      <div class="row">
+        <label><input name="light" type="checkbox" /> 浅色</label>
+        <label><input name="compare" type="checkbox" /> 对比</label>
+      </div>
+    </form>
+
+    <script type="module">
+      const root = document.documentElement;
+      const panel = document.querySelector("#panel");
+
+      // fractalNoise is low-contrast mid-gray; the transfer functions stretch it
+      // toward black/white so it reads like the PNG grain at the same opacity.
+      const svgNoise = `url("data:image/svg+xml,${encodeURIComponent(`
+        <svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'>
+          <filter id='n'>
+            <feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/>
+            <feColorMatrix type='saturate' values='0'/>
+            <feComponentTransfer>
+              <feFuncR type='linear' slope='3' intercept='-1'/>
+              <feFuncG type='linear' slope='3' intercept='-1'/>
+              <feFuncB type='linear' slope='3' intercept='-1'/>
+              <feFuncA type='table' tableValues='1 1'/>
+            </feComponentTransfer>
+          </filter>
+          <rect width='100%' height='100%' filter='url(#n)'/>
+        </svg>`)}")`;
+
+      let canvasNoise;
+      function makeCanvasNoise(size = 256) {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        const image = ctx.createImageData(size, size);
+        for (let i = 0; i < image.data.length; i += 4) {
+          // Same tone curve as noise.png: ~51% black, ~13% white, rest linear.
+          const v = Math.max(0, Math.min(255, ((Math.random() - 0.51) / 0.36) * 255));
+          image.data[i] = image.data[i + 1] = image.data[i + 2] = v;
+          image.data[i + 3] = 255;
+        }
+        ctx.putImageData(image, 0, 0);
+        return `url(${canvas.toDataURL("image/png")})`;
+      }
+
+      const sources = {
+        png: () => 'url("noise.png")',
+        svg: () => svgNoise,
+        canvas: () => (canvasNoise ??= makeCanvasNoise()),
+        none: () => "none",
+      };
+
+      function apply() {
+        const f = panel.elements;
+        root.style.setProperty("--grain-image", sources[f.source.value]());
+        root.style.setProperty("--grain-opacity", f.opacity.value);
+        root.style.setProperty("--grain-size", `${f.size.value}px`);
+        f.opacity.nextElementSibling.value = `${Math.round(f.opacity.value * 100)}%`;
+        f.size.nextElementSibling.value = f.size.value;
+        root.dataset.theme = f.light.checked ? "light" : "dark";
+        root.style.setProperty("--page", f.light.checked && f.page.value === "#121212" ? "#ffffff" : f.page.value);
+        root.toggleAttribute("data-compare", f.compare.checked);
+      }
+
+      // Initial state from the URL, e.g. ?source=svg&opacity=0.1&compare=1
+      for (const [key, value] of new URLSearchParams(location.search)) {
+        const field = panel.elements[key];
+        if (!field) continue;
+        if (field.type === "checkbox") field.checked = value !== "0";
+        else field.value = value;
+      }
+
+      panel.addEventListener("input", apply);
+      panel.addEventListener("submit", (event) => event.preventDefault());
+      apply();
+    </script>
+  </body>
+</html>
