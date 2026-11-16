@@ -1,0 +1,14 @@
+README.md
+  h_9167f02648e56b 54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ecfc4f841cbdfb83b9fe881c1a7710a662d88209",
+  "prompts": {},
+  "humans": {
+    "h_9167f02648e56b": {
+      "author": "haotrr <qinhao@qimao.com>"
+    }
+  }
+}
